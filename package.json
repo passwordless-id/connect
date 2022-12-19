@@ -1,0 +1,42 @@
+{
+  "name": "connect",
+  "version": "1.0.0",
+  "description": "A simple library to \"Sign in with passwordless.id\" and to fetch the user's profile and \"id_token\"",
+  "type": "module",
+  
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/passwordless-id/connect.git"
+  },
+  
+  "keywords": [
+    "passwordless",
+    "authentication",
+    "webauthn",
+    "passkeys",
+    "OAuth2",
+    "OpenID"
+  ],
+  "author": "Arnaud Dagnelies",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/passwordless-id/connect/issues"
+  },
+  "homepage": "https://github.com/passwordless-id/connect#readme",
+  
+  "main": "src/index.js",
+  "unpkg": "dist/connect.min.js",
+  "scripts": {
+    "build": "esbuild src/index.js --platform=browser --sourcemap --minify --target=es2016 --outfile=dist/connect.min.js",
+    "test": "jest",
+    "dev": "http-server"
+  },
+
+  "devDependencies": {
+    "@types/jest": "^29.2.3",
+    "esbuild": "^0.15.8",
+    "http-server": "^14.1.1",
+    "jest": "^29.3.1",
+    "jest-environment-jsdom": "^29.3.1"
+  }
+}

@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css"> 
+
+<div style="display: flex; height: 100vh; align-items: center; justify-content: center; flex-direction: column;">
+    <button onclick="onClickAuth()">auth({scope:'openid avatar email'})</button>
+    <button onclick="onClickRequest()">request({scope:'openid avatar email'})</button>
+    <pre><code id="output"></code></pre>
+</div>
+<script type="module">
+    import passwordless from './src/index.js'
+    
+    window.onClickAuth = () => {
+        passwordless.auth({scope:'openid avatar email'})
+    }
+
+    window.onClickRequest = async () => {
+        const user = await passwordless.request({scope:'openid avatar email'})
+        document.getElementById('output').textContent = JSON.stringify(user, null,' ')
+    }
+</script>
