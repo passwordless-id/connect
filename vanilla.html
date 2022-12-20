@@ -9,43 +9,75 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            
-            background: linear-gradient(123deg,#0089ef 0%,#d4fbff 100%) no-repeat;
-            background: linear-gradient(123deg,#fa759e 0%,#ffd7e5 100%) no-repeat;
-
+            gap: 1rem;
             background: linear-gradient(234deg,#75fa8b 0%,#48dfd2 100%) no-repeat;
-            
         }
     </style>
 </head>
 <body>
 
-    <button id="sign-in"  class="btn btn-light m-2 hidden" onclick="onClickSignIn()">Sign In</button>
+    <div id="spinner" class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+
+    <button id="sign-in"  class="btn btn-light" onclick="onClickSignIn()" hidden>Sign In</button>
     
-    <section id="userinfo" class="card hidden"  style="width: 20rem; text-align: center;">
+    <section id="profile" class="card" style="width: 20rem; text-align: center;" hidden>
         <div class="card-body">
             <img src="https://ui.passwordless.id/avatars/finn.svg" style="height: 5rem"/>
             <h1>Nickname</h1>
         </div>
     </section>
 
-    <button id="sign-out" class="btn btn-light m-2 hidden" onclick="onClickSignOut()">Sign Out</button>
+    <section id="output" class="card container" hidden>
+        <div class="card-body">
+            <pre><code></code></pre>
+        </div>
+    </section>
+
+    <button id="sign-out" class="btn btn-light hidden" onclick="onClickSignOut()" hidden>Sign Out</button>
 
     <script type="module">
         import passwordless from './src/index.js'
         
-        window.onClickSignIn = () => {
-            passwordless.auth({scope:'openid avatar email'})
-        }
+        const scope = 'openid avatar email'
 
-        async function init() {
-            const user = await passwordless.request({scope:'openid avatar email'})
-            document.getElementById('output').textContent = JSON.stringify(user, null,' ')
+        window.onClickSignIn = () => {
+            passwordless.auth({scope})
         }
 
         window.onClickSignOut = async () => {
-            const user = await passwordless.logout()
-            document.getElementById('output').textContent = ''
+            passwordless.logout()
+        }
+
+        async function init() {
+            const user = await passwordless.request({scope})
+            if(user.signedIn && user.scopeGranted) {
+                console.log(user)
+                showUser(user)
+            }
+            else {
+                showSignIn()
+            }
+        }
+
+        init()
+
+        function showUser(user) {
+            document.querySelector('#profile img').src = user.profile.picture
+            document.querySelector('#profile h1').textContent = user.profile.nickname
+            document.querySelector('#output code').textContent = JSON.stringify(user, null,' ')
+
+            document.getElementById('spinner').hidden = true
+            document.getElementById('profile').hidden = false
+            document.getElementById('output').hidden = false
+            document.getElementById('sign-out').hidden = false
+            
+        }
+
+        function showSignIn() {
+            document.getElementById('spinner').hidden = true
+            document.getElementById('sign-in').hidden = false
         }
     </script>
 </body>

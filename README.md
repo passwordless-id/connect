@@ -12,7 +12,7 @@ Demos
 -----
 
 - [vanilla JS](vanilla.html)
-- [even shorter demo](demo.html)
+- [the shortest demo possible](demo.html)
 
 Minimal example
 ---------------
