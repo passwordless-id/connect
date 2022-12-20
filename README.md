@@ -11,8 +11,8 @@ CDN: `https://unpkg.com/@passwordless-id/connect`
 Demos
 -----
 
-- (vanilla JS)[vanilla.html]
-- (even shorter demo)[demo.html]
+- [vanilla JS](vanilla.html)
+- [even shorter demo](demo.html)
 
 Minimal example
 ---------------
