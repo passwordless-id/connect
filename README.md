@@ -3,16 +3,23 @@
 
 > A simple library to "Sign in with passwordless.id" and to fetch the user's profile and "id_token"
 
-NPM: ``
+NPM: `npm install @passwordless-id/connect`
 
-CDN: ``
+CDN: `https://unpkg.com/@passwordless-id/connect`
 
 
+Demos
+-----
+
+- (vanilla JS)[vanilla.html]
+- (even shorter demo)[demo.html]
 
 Minimal example
 ---------------
 
 ```js
+import passwordless from 'https://unpkg.com/@passwordless-id/connect'
+
 const scope = 'openid avatar email'
 const user = await passwordless.request({scope})
 
