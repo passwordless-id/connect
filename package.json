@@ -28,7 +28,6 @@
   "unpkg": "dist/connect.min.js",
   "scripts": {
     "build": "esbuild src/index.js --platform=browser --sourcemap --minify --target=es2016 --outfile=dist/connect.min.js",
-    "test": "jest",
     "dev": "http-server"
   },
 

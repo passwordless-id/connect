@@ -5,23 +5,30 @@ const apiUrl = "https://api.passwordless.id"
 
 export async function auth(options) {
     const args = new URLSearchParams({
-        scope: options.scope ?? 'openid',
-        response_type: options.response_type ?? 'id_token',
+        scope: options?.scope ?? 'openid',
+        response_type: options?.response_type ?? 'id_token',
         client_id: window.location.origin,
-        redirect_uri: options.response_type ?? window.location.href,
-        nonce: options.nonce,
-        state: options.state
+        redirect_uri: options?.response_type ?? window.location.href,
+        nonce: options?.nonce,
+        state: options?.state
     })
     window.location.assign(`${apiUrl}/openid/authorize?${args}`)
 }
 
+export async function logout(options) {
+    const args = new URLSearchParams({
+        redirect_uri: options?.response_type ?? window.location.href,
+        state: options?.state
+    })
+    window.location.assign(`${apiUrl}/openid/logout?${args}`)
+}
 
 const utf8decoder = new TextDecoder()
 
 export async function request(options) {
     const args = new URLSearchParams({
-        scope: options.scope ?? 'openid',
-        nonce: options.nonce
+        scope: options?.scope ?? 'openid',
+        nonce: options?.nonce
     })
     // The API call to fetch the user
     const res = await fetch(`${apiUrl}/openid/id_token?${args}`, {
@@ -75,5 +82,6 @@ export async function request(options) {
 
 export default {
     auth,
-    request
+    request,
+    logout
 }
