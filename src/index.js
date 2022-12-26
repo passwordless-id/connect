@@ -134,6 +134,7 @@ function parseIdToken(id_token) {
 }
 
 export default {
+    id,
     auth,
     request,
     logout
