@@ -51,7 +51,7 @@
         }
 
         async function init() {
-            const user = await passwordless.request({scope})
+            const user = await passwordless.id({scope})
             if(user.signedIn && user.scopeGranted) {
                 console.log(user)
                 showUser(user)

@@ -1,11 +1,49 @@
 const apiUrl = "https://api.passwordless.id"
 //const apiUrl = "http://localhost:8787"
 
+const DEFAULT_SCOPE = 'openid avatar'
+
+export function id(options) {
+    if(options?.cache) {
+        const json = sessionStorage.getItem('passwordless.id/user')
+        if(json) {
+            const user = JSON.parse(raw)
+            if(!isExpired(user.id_token)) // JWT is still valid, not expired
+                return user
+        }
+    }
+    if(window.location.hash) {
+        // check if hash contains ID token
+        const params = new URLSearchParams('?' + window.location.hash.substring(1))
+        const id_token = params.get('id_token')
+        if(id_token) {
+            const profile = parseIdToken(id_token)
+            const user = {
+                signedIn: true,
+                scopeGranted: true,
+                id_token: id_token,
+                profile,
+            }
+            if(options?.cache)
+                sessionStorage.setItem('passwordless.id/user', JSON.stringify(user))
+            params.delete('id_token')
+            // remove it from url
+            location.hash = '#' + params.toString().substring(1)
+            return user
+        }
+    }
+    return request(options)
+}
+
+export function isExpired(id_token) {
+    const payload = parseJwtPayload(id_token)
+    return Date.now() > payload['exp'] * 1000 // milliseconds vs seconds
+}
 
 
 export async function auth(options) {
     const args = new URLSearchParams({
-        scope: options?.scope ?? 'openid',
+        scope: options?.scope ?? DEFAULT_SCOPE,
         response_type: options?.response_type ?? 'id_token',
         client_id: window.location.origin,
         redirect_uri: options?.response_type ?? window.location.href,
@@ -27,7 +65,7 @@ const utf8decoder = new TextDecoder()
 
 export async function request(options) {
     const args = new URLSearchParams({
-        scope: options?.scope ?? 'openid',
+        scope: options?.scope ?? DEFAULT_SCOPE,
         nonce: options?.nonce
     })
     // The API call to fetch the user
@@ -40,21 +78,7 @@ export async function request(options) {
 
     if (res.ok) {
         const json = await res.json()
-        // Please note that the JWT signature is not verified in this example
-        // The profile is simply extracted
-        const payload = json.id_token.split('.')[1]
-        const base64 = payload.replaceAll('-', '+').replaceAll('_', '/')
-        const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
-        const utf8 = utf8decoder.decode(buffer)
-        const profile = JSON.parse(utf8)
-        
-        delete profile['iss']
-        delete profile['aud']
-        delete profile['iat']
-        delete profile['exp']
-        
-        console.debug(profile)
-
+        const profile = parseIdToken(json.id_token)
         return {
             signedIn: true,
             scopeGranted: true,
@@ -79,6 +103,35 @@ export async function request(options) {
     }
 }
 
+
+/**
+ * Please note that this only parses the JWT, the signature is not verified on the client side.
+ * The signatue should be verified server side.
+ */
+function parseJwtPayload(jwt) {
+    const payload = json.id_token.split('.')[1]
+    const base64 = payload.replaceAll('-', '+').replaceAll('_', '/')
+    const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
+    const utf8 = utf8decoder.decode(buffer)
+    const parsed = JSON.parse(utf8)
+    return parsed
+}
+
+function extractProfile(payload) {
+    delete payload['iss']
+    delete payload['aud']
+    delete payload['iat']
+    delete payload['exp']
+
+    return payload
+}
+
+
+function parseIdToken(id_token) {
+    const payload = parseJwtPayload(id_token)
+    const profile = extractProfile(payload)
+    return profile
+}
 
 export default {
     auth,

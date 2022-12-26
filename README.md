@@ -14,17 +14,19 @@ Demos
 - [vanilla JS](vanilla.html)
 - [the shortest demo possible](demo.html)
 
-Minimal example
----------------
+Default usage
+-------------
+
 
 ```js
 import passwordless from 'https://unpkg.com/@passwordless-id/connect'
 
 const scope = 'openid avatar email'
-const user = await passwordless.request({scope})
+const user = await passwordless.id({scope})
+
+console.log(user)
 
 if(user.signedIn && user.scopeGranted) {
-    console.log(user)
     window.alert(`Hello ${user.profile.nickname}`)
 }
 else {
@@ -33,10 +35,36 @@ else {
 }
 ```
 
+### Scope
+
+The `scope` determines the properties you want to read from the user profile. The lesser the scope you require, the more likely it will be granted by the user. It is good practice to request only what you need.
+
+- `openid`: this is the default scope. It will provide the `sub` value, which is an anonymized user ID.
+- `avatar`: Provides `nickname`, `picture` (as url) and `preferred_username`
+- `email`: Provides `email` and `email_verified`
+- `phone`: Provides `phone` and `phone_verified`
+- `profile`: Provides personal information like real name, birthdate and gender
+- `address`: Provides the postal address
+
+### Cache
+
+Setting this value will cache the data in the `sessionStorage`, so that further calls to `passwordless.id()` will first check the cache and return the user data if present. However, if the `id_token` is expired, it will re-perform a redirect or http request in order to fetch a "fresh" `id_token`. Once the user closes the browser *tab*, the user data will be cleared.
 
 
-Sign in/up
-----------
+The `id_token`
+--------------
+
+The `id_token` is a JWT (Json Web Token) that contains both the user's ID and a signature. This can be sent to your server as proof of the user's identity and it's authenticity can be verified by the server.
+
+In order to validate the `id_token` server side, it is sufficient to use:
+
+  GET https://api.passwordless.id/openapi/validate?token=...
+
+
+Advanced usage
+--------------
+
+### Sign in/up
 
 In order to let the user authenticate (sign in or create an account) and authorize your app to read the profile, you must call `auth` as follows.
 
@@ -53,20 +81,7 @@ Once done, the user will be redirected back to the original url, to your web pag
 
 
 
-The `id_token`
---------------
-
-The `id_token` is a JWT (Json Web Token) that contains both the user's ID and a signature. This can be sent to your server as proof of the user's identity and it's authenticity can be verified by the server.
-
-In order to validate the `id_token` server side, it is sufficient to use:
-
-  GET https://api.passwordless.id/openapi/validate?token=...
-
-
-
-
-Fetching `profile` and `id_token`
----------------------------------
+### Fetching `profile` and `id_token`
 
 Unlike OAuth2/OpenID which always require redirects, Passwordless.ID contains an extension to fetch the profile and `id_token` directly: the `request` method. Of course, this only works if the user is currently signed it *and* has granted the requested profile scope.
 
@@ -94,22 +109,7 @@ If this fails, the flags `signedIn` and `scopeGranted` inform you why the user i
 
 
 
-Scope
------
-
-The `scope` determines the properties you want to read from the user profile. The lesser the scope you require, the more likely it will be granted by the user. It is good practice to request only what you need.
-
-- `openid`: this is the default scope. It will provide the `sub` value, which is an anonymized user ID.
-- `avatar`: Provides `nickname`, `picture` (as url) and `preferred_username`
-- `email`: Provides `email` and `email_verified`
-- `phone`:
-- `profile`:
-- `address`:
-
-
-
-Options
--------
+### Options
 
 The `auth(...)` method can be customized further for OAuth2/OpenID flows with the following parameters.
 
@@ -131,8 +131,10 @@ The `nonce` is optional and can be used for increased security, like verifying t
 
 
 
-Dev testing locally
--------------------
+Development
+-----------
+
+### testing locally
 
 ```
 npm install --global http-server

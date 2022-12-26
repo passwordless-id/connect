@@ -9,6 +9,12 @@
 <script type="module">
     import passwordless from './src/index.js'
     
+    async function init() {
+        const user = await passwordless.id({scope:'openid avatar email'})
+        document.getElementById('output').textContent = JSON.stringify(user, null,' ')
+    }
+    init()
+
     window.onClickSignIn = () => {
         passwordless.auth({scope:'openid avatar email'})
     }
