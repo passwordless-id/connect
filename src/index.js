@@ -14,7 +14,7 @@ export function id(options) {
     }
     if(window.location.hash) {
         // check if hash contains ID token
-        const params = new URLSearchParams('?' + window.location.hash.substring(1))
+        const params = new URLSearchParams(window.location.hash.substring(1))
         const id_token = params.get('id_token')
         if(id_token) {
             const profile = parseIdToken(id_token)
@@ -26,9 +26,12 @@ export function id(options) {
             }
             if(options?.cache)
                 sessionStorage.setItem('passwordless.id/user', JSON.stringify(user))
-            params.delete('id_token')
+            
             // remove it from url
-            location.hash = '#' + params.toString().substring(1)
+            params.delete('id_token')
+            const hash = params.toString()
+            location.hash = hash ? '#' + hash : ''
+
             return user
         }
     }
@@ -47,9 +50,12 @@ export async function auth(options) {
         response_type: options?.response_type ?? 'id_token',
         client_id: window.location.origin,
         redirect_uri: options?.response_type ?? window.location.href,
-        nonce: options?.nonce,
-        state: options?.state
     })
+    if(options?.nonce)
+        args.set('nonce', options.nonce)
+    if(options?.state)
+        args.set('state', options.state)
+        
     window.location.assign(`${apiUrl}/openid/authorize?${args}`)
 }
 
@@ -66,15 +72,15 @@ const utf8decoder = new TextDecoder()
 export async function request(options) {
     const args = new URLSearchParams({
         scope: options?.scope ?? DEFAULT_SCOPE,
-        nonce: options?.nonce
     })
+    if(options?.nonce)
+        args.set('nonce', options.nonce)
+
     // The API call to fetch the user
     const res = await fetch(`${apiUrl}/openid/id_token?${args}`, {
         mode: 'cors',
         credentials: 'include'
     })
-
-    const user = {}
 
     if (res.ok) {
         const json = await res.json()
@@ -109,7 +115,7 @@ export async function request(options) {
  * The signatue should be verified server side.
  */
 function parseJwtPayload(jwt) {
-    const payload = jwt.id_token.split('.')[1]
+    const payload = jwt.split('.')[1]
     const base64 = payload.replaceAll('-', '+').replaceAll('_', '/')
     const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
     const utf8 = utf8decoder.decode(buffer)
