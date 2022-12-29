@@ -109,7 +109,7 @@ export async function request(options) {
  * The signatue should be verified server side.
  */
 function parseJwtPayload(jwt) {
-    const payload = json.id_token.split('.')[1]
+    const payload = jwt.id_token.split('.')[1]
     const base64 = payload.replaceAll('-', '+').replaceAll('_', '/')
     const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
     const utf8 = utf8decoder.decode(buffer)
