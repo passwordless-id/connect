@@ -7,6 +7,7 @@ NPM: `npm install @passwordless-id/connect`
 
 CDN: `https://unpkg.com/@passwordless-id/connect`
 
+Github: https://github.com/passwordless-id/connect/
 
 Demos
 -----
