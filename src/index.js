@@ -55,6 +55,8 @@ export async function auth(options) {
         args.set('nonce', options.nonce)
     if(options?.state)
         args.set('state', options.state)
+    if(options?.prompt)
+        args.set('prompt', options.prompt)
         
     window.location.assign(`${apiUrl}/openid/authorize?${args}`)
 }
