@@ -49,7 +49,7 @@ export async function auth(options) {
         scope: options?.scope ?? DEFAULT_SCOPE,
         response_type: options?.response_type ?? 'id_token',
         client_id: window.location.origin,
-        redirect_uri: options?.response_type ?? window.location.href,
+        redirect_uri: options?.redirect_uri ?? window.location.href,
     })
     if(options?.nonce)
         args.set('nonce', options.nonce)
@@ -63,7 +63,7 @@ export async function auth(options) {
 
 export async function logout(options) {
     const args = new URLSearchParams({
-        redirect_uri: options?.response_type ?? window.location.href,
+        redirect_uri: options?.redirect_uri ?? window.location.href,
         state: options?.state
     })
     window.location.assign(`${apiUrl}/openid/logout?${args}`)
